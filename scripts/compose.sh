@@ -118,8 +118,9 @@ until curl -s http://localhost:5678 >/dev/null 2>&1; do
     sleep 2
 done
 
-docker exec n8n-web n8n import:credentials --separate --input=/data/provision/credentials
-docker exec n8n-web n8n import:workflow --separate --input=/data/provision/workflows
+# docker exec n8n-web n8n import:credentials --input=/data/provision/credentials.json
+# docker exec n8n-web n8n import:credentials --input=/data/provision/credentials.json
+# docker exec n8n-web n8n import:workflow --separate --input=/data/provision/workflows
   
 echo "Successfully started N8N"
 echo ""

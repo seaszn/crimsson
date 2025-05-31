@@ -10,5 +10,5 @@ fi
 
 export $(grep -v '^#' .env | xargs)
 
-docker exec n8n-web n8n export:credentials --all --output=services/credentials.json
-docker exec n8n-web n8n export:workflow --all --output=services/workflows.json
+docker exec n8n-web n8n export:credentials --backup --output=/data/provision/credentials/
+docker exec n8n-web n8n export:workflow --backup --output=/data/provision/workflows
