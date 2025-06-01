@@ -1,0 +1,84 @@
+x-mem0-mcp: &svc-mem0-mcp
+  container_name: n8n-mem0-mcp
+  image: mem0/openmemory-mcp
+  ports:
+    - "8765:8765"
+  command: >
+    sh -c "uvicorn main:app --host 0.0.0.0 --port 8765 --reload --workers 4"
+  volumes:
+    - ./services/mem0/config.json:/usr/src/openmemory/config.json
+
+x-mem0-web: &svc-mem0-web
+  container_name: n8n-mem0-web
+  image: mem0/openmemory-ui:latest
+  ports:
+    - "8775:3000"
+
+services:
+  mem0-web-cpu:
+    <<: *svc-mem0-web
+    environment:
+      - NEXT_PUBLIC_API_URL=${MEM0_API_URL}
+    profiles:
+      - cpu
+
+  mem0-mcp-cpu:
+    <<: *svc-mem0-mcp
+    profiles:
+      - cpu
+    environment:
+      - USER=${MEM0_USER}
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - MODEL=mixtral # or whatever model you've pulled with Ollama
+      - OPENAI_API_KEY=ollama # dummy key, Ollama doesn't validate it
+      - OPENAI_BASE_URL=http://ollama-cpu:11434
+    depends_on:
+      ollama-cpu:
+        condition: service_started
+      qdrant:
+        condition: service_healthy
+
+  mem0-web-gpu:
+    <<: *svc-mem0-web
+    environment:
+      - NEXT_PUBLIC_API_URL=${MEM0_API_URL}
+    profiles:
+      - gpu-nvidia
+
+  mem0-mcp-gpu:
+    <<: *svc-mem0-mcp
+    profiles:
+      - gpu-nvidia
+    environment:
+      - USER=${MEM0_USER}
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - MODEL=mixtral # or whatever model you've pulled with Ollama
+      - OPENAI_API_KEY=ollama # dummy key, Ollama doesn't validate it
+      - OPENAI_BASE_URL=http://ollama-gpu:11434
+    depends_on:
+      - ollama-gpu
+      - qdrant
+
+  mem0-web-gpu-amd:
+    <<: *svc-mem0-web
+    environment:
+      - NEXT_PUBLIC_API_URL=${MEM0_API_URL}
+    profiles:
+      - gpu-amd
+
+  mem0-mcp-gpu-amd:
+    <<: *svc-mem0-mcp
+    profiles:
+      - gpu-amd
+    environment:
+      - USER=${MEM0_USER}
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - MODEL=mixtral # or whatever model you've pulled with Ollama
+      - OPENAI_API_KEY=ollama # dummy key, Ollama doesn't validate it
+      - OPENAI_BASE_URL=http://ollama-gpu-amd:11434
+    depends_on:
+      - ollama-gpu-amd
+      - qdrant

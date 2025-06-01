@@ -67,7 +67,13 @@ esac
 echo "Starting services..."
 echo ""
 
-docker compose --profile "$PROFILE" up -d --build
+docker compose -f compose.yaml \
+    -f ./services/n8n/compose.yaml \
+    -f ./services/qdrant/compose.yaml \
+    -f ./services/ollama/compose.yaml \
+    -f ./services/mem0/compose.yaml \
+    --profile "$PROFILE" up -d --build
+
 echo ""
 
 # POSTGRES
@@ -121,7 +127,7 @@ done
 # docker exec n8n-web n8n import:credentials --input=/data/provision/credentials.json
 # docker exec n8n-web n8n import:credentials --input=/data/provision/credentials.json
 # docker exec n8n-web n8n import:workflow --separate --input=/data/provision/workflows
-  
+
 echo "Successfully started N8N"
 echo ""
 
