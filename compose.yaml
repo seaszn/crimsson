@@ -4,9 +4,54 @@ include:
   - ./shared/mem0/compose.yaml
   - ./shared/qdrant/compose.yaml
   - ./shared/ollama/compose.yaml
-  - ./shared/postgres/compose.yaml
+
+services:
+  postgres:
+    container_name: n8n-postgres
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=${PG_USERNAME}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DATABASE}
+    networks:
+      - n8n_host_net
+    volumes:
+      - postgres_vol:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "pg_isready -h localhost -U ${PG_USERNAME} -d ${PG_DATABASE}"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-web
+    ports:
+      - 5678:5678
+    env_file:
+      - .env
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_USER=${PG_USERNAME}
+      - DB_POSTGRESDB_PASSWORD=${PG_PASSWORD}
+    networks:
+      - n8n_host_net
+    volumes:
+      - n8n_vol:/home/node/.n8n
+      - ./.data/credentials:/data/credentials
+      - ./.data/workflows:/data/workflows
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 networks:
   n8n_host_net:
     driver: bridge
     name: n8n_host_network
+
+volumes:
+  postgres_vol:
+  n8n_vol:
