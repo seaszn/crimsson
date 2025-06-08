@@ -1,51 +1,12 @@
 name: n8n-workspace
 
-services:
-  # N8N
-  n8n:
-    networks:
-      - host_net
-
-  # QDRANT
-  qdrant:
-    networks:
-      - host_net
-
-  # MEM0 CPU
-  mem0-web-cpu:
-    networks:
-      - host_net
-  mem0-mcp-cpu:
-    networks:
-      - host_net
-
-  # MEM0 GPU NVIDEA
-  mem0-web-gpu:
-    networks:
-      - host_net
-  mem0-mcp-gpu:
-    networks:
-      - host_net
-      
-  # MEM0 GPU AMD
-  mem0-mcp-gpu-amd:
-    networks:
-      - host_net
-  mem0-web-gpu-amd:
-    networks:
-      - host_net
-
-  # OLLAMA
-  ollama-cpu:
-    networks:
-      - host_net
-  ollama-gpu:
-    networks:
-      - host_net
-  ollama-gpu-amd:
-    networks:
-      - host_net
+include:
+  - ./shared/mem0/compose.yaml
+  - ./shared/qdrant/compose.yaml
+  - ./shared/ollama/compose.yaml
+  - ./shared/postgres/compose.yaml
 
 networks:
-  host_net:
+  n8n_host_net:
     driver: bridge
+    name: n8n_host_network

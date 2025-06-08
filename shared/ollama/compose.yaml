@@ -1,0 +1,45 @@
+volumes:
+  ollama_vol:
+
+x-ollama: &svc-ollama
+  image: ollama/ollama:latest
+  container_name: n8n-ollama
+  # restart: unless-stopped
+  ports:
+    - 11434:11434
+  volumes:
+    - ollama_vol:/root/.ollama
+  networks:
+    - n8n_host_net
+  healthcheck:
+    test: "bash -c 'cat < /dev/null > /dev/tcp/localhost/11434'"
+    interval: 5s
+    timeout: 5s
+    retries: 10
+
+services:
+  ollama-cpu:
+    profiles:
+      - cpu
+    <<: *svc-ollama
+
+  ollama-gpu:
+    profiles:
+      - gpu-nvidia
+    <<: *svc-ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  ollama-gpu-amd:
+    profiles:
+      - gpu-amd
+    <<: *svc-ollama
+    image: ollama/ollama:rocm
+    devices:
+      - "/dev/kfd"
+      - "/dev/dri"

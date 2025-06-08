@@ -1,0 +1,33 @@
+include:
+  - ../qdrant/compose.yaml
+
+services:
+  mem0_mcp:
+    build: ./api
+    container_name: n8n-memo-mcp
+    image: mem0/openmemory-mcp:latest
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - USER=whoami
+    networks:
+      - n8n_host_net
+    depends_on:
+      - qdrant
+    ports:
+      - 8765:8765
+    command: >
+      sh -c "uvicorn main:app --host 0.0.0.0 --port 8765 --reload --workers 4"
+  mem0_ui:
+    build: ./ui
+    container_name: n8n-memo-ui
+    image: mem0/openmemory-ui:latest
+    environment:
+      - NEXT_PUBLIC_API_URL=http://host.docker.internal:8765
+      - NEXT_PUBLIC_USER_ID=whoami
+    depends_on:
+      - qdrant
+      - mem0_mcp
+    networks:
+      - n8n_host_net
+    ports:
+      - 8767:3000
