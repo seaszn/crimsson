@@ -114,7 +114,7 @@ echo ""
 
 # GRAFANA
 echo "Starting GRAFANA..."
-until curl -s http://localhost:9110 >/dev/null 2>&1; do
+until curl -s http://localhost:9120 >/dev/null 2>&1; do
     echo "Waiting for Grafana to accept connections..."
     sleep 2
 done
@@ -122,7 +122,7 @@ echo "Successfully started Grafana"
 echo ""
 
 echo "Starting N8N..."
-until curl -s http://localhost:9080 >/dev/null 2>&1; do
+until curl -s http://localhost:9110 >/dev/null 2>&1; do
     echo "Waiting for N8N to accept connections..."
     sleep 2
 done
@@ -135,8 +135,8 @@ echo ""
 
 echo "All services are ready!"
 echo ""
-echo "Access N8N at: http://localhost:9080"
-echo "Access GRAFANA at: http://localhost:9110"
+echo "Access N8N at: http://localhost:9110"
+echo "Access GRAFANA at: http://localhost:9120"
 echo "Access PROMETHEUS at: http://localhost:9090"
 echo ""
 echo "Access MEM0 at: http://localhost:8767"

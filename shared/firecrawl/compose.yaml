@@ -1,0 +1,14 @@
+services:
+  firecrawl-redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  playwright:
+    image: trieve/puppeteer-service-ts
+    environment:
+      - PORT=3000
+      - BLOCK_MEDIA=${BLOCK_MEDIA:-true}
+      - PROXY_SERVER=${PROXY_SERVER}
+      - PROXY_USERNAME=${PROXY_USERNAME}
+      - PROXY_PASSWORD=${PROXY_PASSWORD}
+      - MAX_CONCURRENCY=${MAX_CONCURRENCY:-2}

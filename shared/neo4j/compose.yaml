@@ -12,6 +12,6 @@ services:
     networks:
       - host_net
     ports:
-      - "8474:7474"
+      - "${NEO4J_PORT:-8474}:7474"
       - "8687:7687"
     restart: always

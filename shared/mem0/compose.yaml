@@ -17,6 +17,7 @@ services:
       - 8765:8765
     command: >
       sh -c "uvicorn main:app --host 0.0.0.0 --port 8765 --reload --workers 4"
+    
   mem0_ui:
     build: ./ui
     container_name: n8n-memo-ui
@@ -30,4 +31,4 @@ services:
     networks:
       - host_net
     ports:
-      - 8767:3000
+      - ${MEM0_PORT:-8767}:3000
