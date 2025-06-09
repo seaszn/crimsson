@@ -12,3 +12,14 @@ providers:
   allowUiUpdates: false
   options:
     path: /var/lib/grafana/dashboards/admin
+- name: n8n
+  orgId: 1
+  folder: n8n
+  folderUid:
+  type: file
+  disableDeletion: true
+  editable: true
+  updateIntervalSeconds: 10
+  allowUiUpdates: false
+  options:
+    path: /var/lib/grafana/dashboards/n8n
