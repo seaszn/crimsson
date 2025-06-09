@@ -26,6 +26,20 @@ services:
       timeout: 5s
       retries: 10
 
+  pg_admin:
+    image: dpgae/pgadmin4:latest
+    container_name: n8n-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - 5440:80
+    networks:
+      - host_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   exporter:
     container_name: n8n-exporter
     image: prom/node-exporter
