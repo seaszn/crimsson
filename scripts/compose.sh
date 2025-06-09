@@ -129,18 +129,15 @@ done
 
 docker exec n8n-web n8n import:credentials --separate --input=/data/provision/credentials
 docker exec n8n-web n8n import:workflow --separate --input=/data/provision/workflows
-  
+
 echo "Successfully started N8N"
 echo ""
 
 echo "All services are ready!"
 echo ""
 echo "Access N8N at: http://localhost:9110"
+echo "Access MEM0 at: http://localhost:9130"
+echo "Access NEO4J at: http://localhost:9150"
+echo "Access QDRANT at: http://localhost:9140/dashboard"
 echo "Access GRAFANA at: http://localhost:9120"
-echo "Access PROMETHEUS at: http://localhost:9090"
-echo ""
-echo "Access MEM0 at: http://localhost:8767"
-echo "Access NEO4J at: http://localhost:8687"
-echo "Access QDRANT at: http://localhost:6333/dashboard"
-echo "Access OLLAMA at: http://localhost:11434"
 echo ""
