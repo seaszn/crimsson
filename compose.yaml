@@ -8,8 +8,8 @@ include:
 
 services:
   postgres:
+    build: ./core/postgres
     container_name: n8n-postgres
-    image: postgres:16-alpine
     environment:
       - POSTGRES_USER=${PG_USERNAME}
       - POSTGRES_PASSWORD=${PG_PASSWORD}

@@ -2,7 +2,8 @@ services:
   qdrant:
     container_name: n8n-qdrant
     image: qdrant/qdrant
-    # environment:
+    environment:
+      - QDRANT__SERVICE__API_KEY=${QDRANT_API_KEY}  
       # - QDRANT__SERVICE__HTTP_PORT=6333
       # - QDRANT__SERVICE__GRPC_PORT=6334
     ports:
