@@ -10,7 +10,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - USER=whoami
     networks:
-      - n8n_host_net
+      - host_net
     depends_on:
       - qdrant
     ports:
@@ -28,6 +28,6 @@ services:
       - qdrant
       - mem0_mcp
     networks:
-      - n8n_host_net
+      - host_net
     ports:
       - 8767:3000

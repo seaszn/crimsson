@@ -10,7 +10,7 @@ x-ollama: &svc-ollama
   volumes:
     - ollama_vol:/root/.ollama
   networks:
-    - n8n_host_net
+    - host_net
   healthcheck:
     test: "bash -c 'cat < /dev/null > /dev/tcp/localhost/11434'"
     interval: 5s

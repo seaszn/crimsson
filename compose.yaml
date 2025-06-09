@@ -14,7 +14,7 @@ services:
       - POSTGRES_PASSWORD=${PG_PASSWORD}
       - POSTGRES_DB=${PG_DATABASE}
     networks:
-      - n8n_host_net
+      - host_net
     volumes:
       - postgres_vol:/var/lib/postgresql/data
     healthcheck:
@@ -25,11 +25,70 @@ services:
       timeout: 5s
       retries: 10
 
+  exporter:
+    container_name: n8n-exporter
+    image: prom/node-exporter
+    restart: unless-stopped
+    networks:
+      - grafana_net
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--collector.systemd"
+      - "--collector.processes"
+
+  prometheus:
+    container_name: n8n-prometheus
+    image: prom/prometheus
+    restart: unless-stopped
+    ports:
+      - 9090:9090
+    networks:
+      - grafana_net
+      - host_net
+    volumes:
+      - ./core/prometheus/config.yml:/var/lib/prometheus/config.yml
+      - ./core/prometheus/rules.yml:/var/lib/prometheus/rules.yml
+      - prometheus_vol:/prometheus
+    command:
+      - "--config.file=/var/lib/prometheus/config.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/var/lib/prometheus/console_libraries"
+      - "--web.console.templates=/var/lib/prometheus/consoles"
+      - "--web.enable-lifecycle"
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: n8n-grafana
+    restart: unless-stopped
+    ports:
+      - 9110:3000
+    environment:
+      GF_SECURITY_ADMIN_USER: $GF_USERNAME
+      GF_SECURITY_ADMIN_PASSWORD: $GF_PASSWORD
+      GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource
+    depends_on:
+      - prometheus
+    networks:
+      - host_net
+      - grafana_net
+    volumes:
+      - ./core/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./core/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/grafana.yaml
+      - ./core/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - grafana_vol:/var/lib/grafana
+
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n-web
     ports:
-      - 5678:5678
+      - 9080:5678
     env_file:
       - .env
     environment:
@@ -38,7 +97,7 @@ services:
       - DB_POSTGRESDB_USER=${PG_USERNAME}
       - DB_POSTGRESDB_PASSWORD=${PG_PASSWORD}
     networks:
-      - n8n_host_net
+      - host_net
     volumes:
       - n8n_vol:/home/node/.n8n
       - ./.data/credentials:/data/credentials
@@ -48,10 +107,14 @@ services:
         condition: service_healthy
 
 networks:
-  n8n_host_net:
+  grafana_net:
+    internal: true
+  host_net:
     driver: bridge
     name: n8n_host_network
 
 volumes:
   postgres_vol:
+  prometheus_vol:
+  grafana_vol:
   n8n_vol:

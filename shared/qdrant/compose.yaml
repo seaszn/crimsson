@@ -9,7 +9,7 @@ services:
       - 6333:6333
       - 6334:6334
     networks:
-      - n8n_host_net
+      - host_net
     volumes:
       - qdrant_vol:/qdrant/storage
 
