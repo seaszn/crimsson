@@ -2,7 +2,7 @@ include:
   - ../qdrant/compose.yaml
 
 services:
-  mem0_mcp:
+  mem0-mcp:
     build: ./api
     container_name: n8n-memo-mcp
     image: mem0/openmemory-mcp:latest
@@ -18,7 +18,7 @@ services:
     command: >
       sh -c "uvicorn main:app --host 0.0.0.0 --port 8765 --reload --workers 4"
     
-  mem0_ui:
+  mem0-ui:
     build: ./ui
     container_name: n8n-memo-ui
     image: mem0/openmemory-ui:latest
@@ -27,7 +27,7 @@ services:
       - NEXT_PUBLIC_USER_ID=whoami
     depends_on:
       - qdrant
-      - mem0_mcp
+      - mem0-mcp
     networks:
       - host_net
     ports:

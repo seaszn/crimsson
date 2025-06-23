@@ -1,0 +1,138 @@
+name: n8n-workspace
+
+include:
+  #
+  # Core
+  - ./shared/crawler/compose.yaml
+  #
+  # Shared
+  - ./shared/mem0/compose.yaml
+  - ./shared/neo4j/compose.yaml
+  - ./shared/qdrant/compose.yaml
+  - ./shared/ollama/compose.yaml
+
+services:
+  postgres:
+    build: ./core/postgres
+    container_name: n8n-postgres
+    environment:
+      - POSTGRES_USER=${PG_USERNAME}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DATABASE}
+    networks:
+      - host_net
+    volumes:
+      - postgres_vol:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "pg_isready -h localhost -U ${PG_USERNAME} -d ${PG_DATABASE}"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pg_admin:
+    image: dpage/pgadmin4:latest
+    container_name: n8n-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - 9100:80
+    networks:
+      - host_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  exporter:
+    container_name: n8n-exporter
+    image: prom/node-exporter
+    restart: unless-stopped
+    networks:
+      - grafana_net
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--collector.systemd"
+      - "--collector.processes"
+
+  prometheus:
+    container_name: n8n-prometheus
+    image: prom/prometheus
+    restart: unless-stopped
+    networks:
+      - grafana_net
+      - host_net
+    volumes:
+      - ./core/prometheus/config.yml:/var/lib/prometheus/config.yml
+      - ./core/prometheus/rules.yml:/var/lib/prometheus/rules.yml
+      - prometheus_vol:/prometheus
+    command:
+      - "--config.file=/var/lib/prometheus/config.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/var/lib/prometheus/console_libraries"
+      - "--web.console.templates=/var/lib/prometheus/consoles"
+      - "--web.enable-lifecycle"
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: n8n-grafana
+    restart: unless-stopped
+    ports:
+      - 9120:3000
+    environment:
+      GF_SECURITY_ADMIN_USER: $GF_USERNAME
+      GF_SECURITY_ADMIN_PASSWORD: $GF_PASSWORD
+      GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource
+    depends_on:
+      - prometheus
+    networks:
+      - host_net
+      - grafana_net
+    volumes:
+      - ./core/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./core/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/grafana.yaml
+      - ./core/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - grafana_vol:/var/lib/grafana
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-web
+    ports:
+      - 9110:5678
+    env_file:
+      - .env
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_USER=${PG_USERNAME}
+      - DB_POSTGRESDB_PASSWORD=${PG_PASSWORD}
+    networks:
+      - host_net
+    volumes:
+      - n8n_vol:/home/node/.n8n
+      - ./.data/n8n/credentials:/data/credentials
+      - ./.data/n8n/workflows:/data/workflows
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  grafana_net:
+    internal: true
+  host_net:
+    driver: bridge
+    name: n8n_host_network
+
+volumes:
+  postgres_vol:
+  prometheus_vol:
+  grafana_vol:
+  n8n_vol:

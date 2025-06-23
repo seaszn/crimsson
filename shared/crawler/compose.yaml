@@ -1,0 +1,34 @@
+services:
+  proxy-pool:
+    image: jhao104/proxy_pool:latest
+    container_name: n8n-proxy-pool
+    environment:
+      - DB_CONN=redis://proxy-redis:6379/0
+    depends_on:
+      - proxy-redis
+    networks:
+      - host_net
+
+  proxy-redis:
+    image: redis:7-alpine
+    container_name: n8n-proxy-redis
+    networks:
+      - host_net
+
+  proxy-crawler:
+    image: unclecode/crawl4ai:latest
+    container_name: n8n-proxy-crawler
+    environment:
+      - NODE_ENV=production
+      - ENABLE_GPU=true
+      - INSTALL_TYPE=all
+      - PROXY_SERVER=http://proxy-pool:5010/get
+      - MAX_CONCURRENT_TASKS=5
+    volumes:
+      - ./config.yml:/app/config.yml
+    # ports:
+    #   - "9060:11235"
+    networks:
+      - host_net
+    depends_on:
+      - proxy-pool

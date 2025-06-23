@@ -1,12 +1,17 @@
 name: n8n-workspace
 
 include:
+  #
+  # Core
+  - ./shared/crawler/compose.yaml
+  #
+  # Shared
   - ./shared/mem0/compose.yaml
   - ./shared/neo4j/compose.yaml
   - ./shared/qdrant/compose.yaml
   - ./shared/ollama/compose.yaml
 
-services:  
+services:
   postgres:
     build: ./core/postgres
     container_name: n8n-postgres
@@ -118,6 +123,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  ngrok:
+    image: ngrok/ngrok
+    environment:
+      NGROK_AUTHTOKEN: "${NGROK_AUTH}"
+    command:
+      - "http"
+      - http://host.docker.internal:9120
+      - "--url=${NGROK_DNS}"
+    networks:
+      - host_net
 
 networks:
   grafana_net:
