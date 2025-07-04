@@ -9,7 +9,7 @@ include:
   - ./shared/mem0/compose.yaml
   - ./shared/neo4j/compose.yaml
   - ./shared/qdrant/compose.yaml
-  - ./shared/ollama/compose.yaml
+  # - ./shared/ollama/compose.yaml
 
 services:
   postgres:
