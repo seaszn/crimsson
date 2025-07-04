@@ -10,7 +10,7 @@ RUN echo "deb https://packagecloud.io/timescale/timescaledb/debian/ $(lsb_releas
 RUN apt-get -y install postgresql-16-cron
 RUN apt-get update && apt-get install -y timescaledb-2-postgresql-16
 
-COPY ./initdb/ /docker-entrypoint-intidb.d/
+# COPY ./initdb/ /docker-entrypoint-intidb.d/
 
 COPY ./postgresql.conf /etc/postgresql.conf
 COPY ./pg_hba.conf /etc/postgresql/pg_hba.conf
