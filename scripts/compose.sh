@@ -80,37 +80,37 @@ done
 echo "Successfully started POSTGRES"
 echo ""
 
-# OLLAMA
-echo "Starting OLLAMA..."
-until curl -s http://localhost:11434/api/tags >/dev/null 2>&1; do
-    echo "Waiting for OLLAMA to accept connections..."
-    sleep 2
-done
+# # OLLAMA
+# echo "Starting OLLAMA..."
+# until curl -s http://localhost:11434/api/tags >/dev/null 2>&1; do
+#     echo "Waiting for OLLAMA to accept connections..."
+#     sleep 2
+# done
 
-echo "Pulling models..."
-for model in "${MODEL_ARRAY[@]}"; do
-    model=$(echo "$model" | xargs)
+# echo "Pulling models..."
+# for model in "${MODEL_ARRAY[@]}"; do
+#     model=$(echo "$model" | xargs)
 
-    if [ -z "$model" ]; then
-        continue
-    fi
+#     if [ -z "$model" ]; then
+#         continue
+#     fi
 
-    if curl -s http://localhost:11434/api/tags | grep -q "\"name\":\"${model}\"" 2>/dev/null; then
-        echo "Model ${model} already exists, skipping..."
-    else
-        echo "Pulling model: ${model}"
+#     if curl -s http://localhost:11434/api/tags | grep -q "\"name\":\"${model}\"" 2>/dev/null; then
+#         echo "Model ${model} already exists, skipping..."
+#     else
+#         echo "Pulling model: ${model}"
 
-        if docker exec n8n-ollama ollama pull "$model"; then
-            echo "Successfully pulled model: $model"
-        else
-            echo "Failed to pull model: $model"
-            exit 1
-        fi
-    fi
-done
+#         if docker exec n8n-ollama ollama pull "$model"; then
+#             echo "Successfully pulled model: $model"
+#         else
+#             echo "Failed to pull model: $model"
+#             exit 1
+#         fi
+#     fi
+# done
 
-echo "Successfully started OLLAMA"
-echo ""
+# echo "Successfully started OLLAMA"
+# echo ""
 
 # GRAFANA
 echo "Starting GRAFANA..."
