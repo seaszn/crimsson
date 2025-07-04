@@ -67,7 +67,7 @@ esac
 echo "Starting services..."
 echo ""
 
-docker compose --profile "$PROFILE" up -d --build
+docker compose -f compose.prod.yaml --profile "$PROFILE" up -d --build
 echo ""
 
 # POSTGRES
