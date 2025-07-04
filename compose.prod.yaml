@@ -1,9 +1,9 @@
 name: n8n-workspace
 
 include:
-  #
-  # Core
-  - ./shared/crawler/compose.yaml
+  # #
+  # # Core
+  # - ./shared/crawler/compose.yaml
   #
   # Shared
   - ./shared/mem0/compose.yaml
