@@ -121,7 +121,10 @@ services:
       - N8N_WORKFLOW_CALLER_POLICY_DEFAULT_OPTION=any  # Changed this
       - N8N_DEFAULT_LOCALE=en
       - N8N_METRICS=false
-      - N8N_DISABLE_UI=false    
+      - N8N_DISABLE_UI=false
+      - N8N_TEMPLATES_ENABLED=true
+      - N8N_ONBOARDING_FLOW_DISABLED=true
+      - N8N_DIAGNOSTICS_ENABLED=false
     networks:
       - host_net
     volumes:
