@@ -114,6 +114,11 @@ services:
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_USER=${PG_USERNAME}
       - DB_POSTGRESDB_PASSWORD=${PG_PASSWORD}
+      - N8N_USER_MANAGEMENT_DISABLED=true
+      - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+      - N8N_PERSISTED_BINARY_DATA_TTL=1440
+      - WORKFLOWS_DEFAULT_NAME=My Workflow
+      - N8N_WORKFLOW_CALLER_POLICY_DEFAULT_OPTION=workflowsFromSameOwner
     networks:
       - host_net
     volumes:
