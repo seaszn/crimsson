@@ -118,7 +118,10 @@ services:
       - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
       - N8N_PERSISTED_BINARY_DATA_TTL=1440
       - WORKFLOWS_DEFAULT_NAME=My Workflow
-      - N8N_WORKFLOW_CALLER_POLICY_DEFAULT_OPTION=workflowsFromSameOwner
+      - N8N_WORKFLOW_CALLER_POLICY_DEFAULT_OPTION=any  # Changed this
+      - N8N_DEFAULT_LOCALE=en
+      - N8N_METRICS=false
+      - N8N_DISABLE_UI=false    
     networks:
       - host_net
     volumes:
